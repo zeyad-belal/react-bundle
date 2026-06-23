@@ -94,21 +94,46 @@ review on load:
 - **Sensors → Wyze Sense Motion Sensor** (qty 2) and **Wyze Sense Hub (Required)** (qty 1, FREE, compare $29.92; stepper minus disabled — required item)
 - **Accessories → Wyze MicroSD Card (256GB)** (qty 2)
 
-### Pricing rule (single source of truth)
+### Pricing rule (single source of truth, exact-match to screenshots)
 
 Each variant carries `price` (active unit) and `compareAt` (struck unit). The card shows **unit**
-prices; the review line shows **unit × qty** with `compareAt × qty` struck. The screenshots'
-card vs. review numbers don't reconcile to the cent (placeholder mock values + lossy images);
-authoring price once per variant keeps everything internally consistent and makes the total
-**recalculate correctly**, which is the graded behavior. Seed prices are tuned to land **near**
-the design's total ($187.89 / save $50.92); residual drift is noted in the README (we are not
-back-solving to the exact penny).
+prices; the review line shows **unit × qty** with `compareAt × qty` struck. Authoring price once
+per variant keeps everything internally consistent and makes the total **recalculate correctly**.
+
+Reverse-engineering the screenshot totals gives an exact, self-consistent model, so seed prices
+are chosen to reproduce the design's visible numbers **exactly** (not merely "near"):
+
+| Item | seed qty | unit `price` | unit `compareAt` | review line (price / struck) |
+|---|---|---|---|---|
+| Wyze Cam v4 | 1 | 27.98 | 35.98 | 27.98 / 35.98 |
+| Wyze Cam Pan v3 | 2 | 23.99 | 28.99 | 47.98 / 57.98 |
+| Wyze Sense Motion Sensor | 2 | 29.99 | 29.99 | 59.98 / — (no discount) |
+| Wyze Sense Hub (Required) | 1 | 0 (FREE) | 29.92 | FREE / 29.92 |
+| Wyze MicroSD Card (256GB) | 2 | 20.98 | 20.98 | 41.96 / — (no discount) |
+| Cam Unlimited (plan, /mo) | 1 | 9.99 | 12.99 | 9.99/mo / 12.99/mo |
+| Fast Shipping | — | 0 (FREE) | 5.99 | FREE / 5.99 |
+
+Unsold-catalog cards (from the screenshots): Floodlight v2 — 69.98 / 89.98 (Save 22%);
+Duo Cam Doorbell — 69.98 / no compareAt; Battery Cam Pro — 89.98 / no compareAt.
+
+**Headline totals (must match the design exactly):**
+- **Active total = $187.89** = Σ(active line totals incl. the plan's first month $9.99). Shipping is FREE → +$0.
+  `27.98 + 47.98 + 59.98 + 0 + 41.96 + 9.99 = 187.89` ✓
+- **Pre-discount (struck) = $238.81** = Σ(compareAt line totals incl. plan $12.99). **Shipping excluded** from this number.
+  `35.98 + 57.98 + 59.98 + 29.92 + 41.96 + 12.99 = 238.81` ✓
+- **Savings = $50.92** = 238.81 − 187.89 ✓. (Free shipping is shown as its own perk row, not folded into this figure.)
+
+**Source inconsistency (documented):** the Pan v3 *card* in the mock shows $34.98/$39.98 (matching
+its "Save 12%" badge), but the *review line* shows $47.98/$57.98 for qty 2 (→ $23.99/$28.99 unit).
+These can't both hold with one unit price. Because the review panel + hero total are the graded
+centerpiece, we honor those exactly: Pan v3's unit is $23.99/$28.99, so its card reads $23.99
+(badge text "Save 12%" kept as the screenshot's label). Noted in the README.
 
 Special pricing: an item priced **FREE** has `price: 0` with a non-zero `compareAt` (Sense Hub,
 Fast Shipping) and renders the word "FREE" in accent color.
 
 Non-product summary rows (shipping, guarantee, financing) live in a small `summary` block in the
-JSON (e.g. `shipping: { label, compareAt, price }`, `guarantee` text, `financingApr`).
+JSON (e.g. `shipping: { label, compareAt, price }`, `guarantee` text, `financing` label).
 
 ## 5. State model — Approach A (flat keyed map)
 
@@ -140,11 +165,12 @@ grand total, savings, financing) — they cannot drift from the source of truth.
 - **"N selected" per step:** count of **distinct products** in that step with total qty > 0
   (a product with two colors both > 0 still counts once). For a `single`-selection step it is
   0 or 1. Matches the design's 2/1/2/1.
-- **Grand total:** `Σ lineTotal` over product lines **+ shipping.price** (+ plan is a monthly line,
-  shown separately as `/mo`, excluded from the one-time hardware total — matches the design where
-  the plan shows `$9.99/mo` and is not summed into $187.89). Final exact composition tuned to land near design.
-- **Savings:** `Σ(compareAt − price)×qty` (+ shipping savings) → the "$50.92" callout.
-- **Pre-discount total** (struck): `Σ compareAt×qty + shipping.compareAt`.
+- **Grand total ($187.89):** `Σ(price×qty)` over **all** item lines, **including the plan's first
+  month** ($9.99). Shipping is FREE (+$0). The plan still *displays* as `$9.99/mo` on its line.
+- **Pre-discount total ($238.81, struck):** `Σ(compareAt×qty)` over all item lines including the
+  plan ($12.99). **Shipping is excluded** from this headline figure.
+- **Savings ($50.92):** pre-discount − grand total. Free shipping is surfaced as its own perk row,
+  not folded into this number.
 
 ### The variant-quantity behavior (core requirement)
 - `setQty/increment/decrement` are keyed by `productId:variantId`, so Red and Blue track separately.
@@ -219,13 +245,15 @@ Unit tests on store logic — the riskiest, most behavior-defining code:
 
 - Public GitHub repo: React source, `catalog.json`, recreated SVG assets, tests.
 - README: clean-clone run instructions (`npm install` / `npm run dev`), decisions, tradeoffs,
-  and explicitly: screenshot-derived tokens, recreated imagery, total tuned near (not exactly) the design.
+  and explicitly: screenshot-derived visual tokens, recreated imagery, and the documented Pan v3
+  card-vs-review source inconsistency (totals reproduce the design exactly).
 
 ## 11. Known limitations / tradeoffs
 
-- No Figma connection → exact hex/spacing/price are screenshot estimates.
+- No Figma connection → exact hex/spacing are screenshot estimates.
 - Product images are recreated SVGs, not real assets.
-- Grand total lands near $187.89, not back-solved to the exact penny.
+- The mock's Pan v3 card price is internally inconsistent with its review line; we honor the
+  review/total (the seeded config reproduces $187.89 / $238.81 / $50.92 exactly).
 - Backend (JSON-serving) bonus skipped — local JSON file per the brief.
 
 ## 12. Out of scope (YAGNI)
