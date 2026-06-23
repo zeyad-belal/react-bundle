@@ -1,32 +1,96 @@
-# React + TypeScript + Vite
+# Wyze Bundle Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A multi-step **bundle builder** with a live **"Your security system"** review panel, built as a
+React prototype. The shopper assembles a security system across a 4-step accordion (cameras → plan
+→ sensors → extra protection); the review panel reflects every selection in real time, recalculates
+the total as quantities change, and the whole configuration can be saved to and restored from the
+browser.
 
-Currently, two official plugins are available:
+## Run it
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Requires Node 20+.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev      # start the dev server (prints a localhost URL)
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Other scripts:
+
+```bash
+npm test         # run the unit + integration tests (Vitest)
+npm run build    # type-check (tsc) + production build (Vite)
+npm run lint     # oxlint
+```
+
+Everything runs from a clean clone with just `npm install` — there is no backend to start.
+
+## How it works
+
+```
+src/
+  data/catalog.json     ← the single data source: steps, products, variants, prices, seed
+  types.ts              ← Catalog/Product/Variant/Step types + vkey() helper
+  store/
+    useBundleStore.ts   ← Zustand store: qty, activeVariant, openStepId (+ persist)
+    selectors.ts        ← pure derivations: review lines, "N selected", totals/savings
+  components/
+    BuilderColumn → AccordionStep → ProductCard → VariantChips · QtyStepper · PriceTag
+    ReviewPanel   → ReviewLine · SummaryFooter · GuaranteeBadge
+public/products/*.svg   ← recreated device illustrations
+```
+
+**Data-driven.** Every card and review line is rendered by mapping over `catalog.json` — there is no
+per-product markup. Adding a product is a JSON edit.
+
+**Tiny store, everything else derived.** The store holds only what the user changes:
+
+- `qty` — a flat map keyed by `productId:variantId`, so each color/variant is counted separately
+- `activeVariant` — which chip is selected per product (this is what makes the card's stepper read
+  "0 for Blue" while the 2 Reds you added still show in the review)
+- `openStepId` — which accordion step is expanded
+
+The review lines, the per-step "N selected" counts, and the totals are **pure selector functions**
+of `qty`. Because they're derived, they can never drift out of sync — changing a quantity on the
+card and on the review line is literally the same store entry, and the total recomputes from the
+same source.
+
+**Persistence.** The store uses Zustand's `persist` middleware to mirror `{ qty, activeVariant,
+openStepId }` to `localStorage` (key `wyze-bundle-v1`). State auto-restores on reload; the **Save my
+system for later** link makes that save intent explicit and shows a confirmation.
+
+**Tests.** Vitest covers the logic that actually carries risk: variant-quantity isolation, the
+required-item clamp (Sense Hub can't drop below 1), single-select plan behavior, the exact totals
+($187.89 / $238.81 / $50.92), "N selected" counting distinct products, persistence round-trip, and a
+full-app integration render. Run `npm test`.
+
+## Decisions & tradeoffs
+
+- **Built from the screenshots, not Figma.** A live Figma connection wasn't available, so exact
+  hex/spacing are estimated from the provided screenshots and tuned by eye. The design tokens live as
+  CSS variables in `src/index.css` (`@theme`) so they're easy to adjust in one place.
+- **Recreated product imagery.** The real Wyze product photos weren't available, so each device is a
+  hand-crafted SVG in `public/products/` (no external/copyright dependency). They're referenced by an
+  `image` field in the catalog and swap out cleanly for real assets.
+- **Exact totals, and a documented source inconsistency.** The seeded prices are chosen so the review
+  panel and headline total reproduce the design exactly ($187.89 active, $238.81 struck, $50.92
+  saved — with the plan's first month included and free shipping shown as a separate perk). One catch:
+  in the mock, the Wyze Cam Pan v3 **card** shows $34.98/unit (matching its "Save 12%" badge) while
+  the **review line** shows $47.98 for qty 2 (→ $23.99/unit). Those can't both be true with one unit
+  price, so I honored the review panel + total (the graded centerpiece); the Pan v3 card therefore
+  reads $23.99.
+- **Plan is single-select.** A subscription isn't a quantity, so the plan step uses radio-style cards
+  (`selection: "single"` in the catalog) and its review line shows price only — no stepper — matching
+  the design. Every other step uses quantity steppers.
+- **Responsive.** Desktop (≥1024px) is the two-column layout with a sticky review sidebar; on tablet
+  the review stacks below the builder; on mobile it's a single column. Verified down to phone widths.
+- **Checkout** is a demo confirmation (no payment). The **backend bonus was skipped** — a local JSON
+  file per the brief.
+
+## Not done / could go further
+
+- Visual fidelity is matched at the code level from screenshots; with a Figma connection the tokens
+  could be pixel-exact.
+- No active-chip highlight styling (explicitly deferred by the brief — the selection *behavior* and
+  its flow into the review panel are what matter, and those work).
+- Accessibility is sensible-defaults (labelled controls, semantic regions) but not audited.
