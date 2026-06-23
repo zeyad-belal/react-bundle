@@ -23,8 +23,8 @@ export function ProductCard({ product, selection, stepId }: Props) {
   return (
     <article
       className={clsx(
-        'relative flex gap-4 rounded-[var(--radius-card)] border bg-white p-4 transition',
-        selected ? 'border-accent ring-1 ring-accent' : 'border-line',
+        'relative flex gap-4 rounded-card border-2 bg-white p-4 transition',
+        selected ? 'border-accent' : 'border-line',
       )}
     >
       {product.badge && (

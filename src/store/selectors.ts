@@ -95,17 +95,31 @@ export interface ReviewGroup {
   lines: ReviewLine[]
 }
 
-/** Review lines bucketed by category, preserving first-seen order. */
-export function useGroupedReview(): ReviewGroup[] {
-  const lines = useReviewLines()
-  const order: string[] = []
+/**
+ * Display order of review groups. The design lists the plan LAST (just above the
+ * shipping row), even though it's step 2 in the builder — so this differs from the
+ * builder's step order on purpose. Unlisted categories fall back to first-seen order.
+ */
+const REVIEW_ORDER = ['Cameras', 'Sensors', 'Accessories', 'Plan']
+
+/** Review lines bucketed by category, ordered to match the design. Pure + testable. */
+export function groupReview(lines: ReviewLine[]): ReviewGroup[] {
+  const seen: string[] = []
   const map = new Map<string, ReviewLine[]>()
   for (const l of lines) {
     if (!map.has(l.category)) {
       map.set(l.category, [])
-      order.push(l.category)
+      seen.push(l.category)
     }
     map.get(l.category)!.push(l)
   }
-  return order.map((category) => ({ category, lines: map.get(category)! }))
+  const rank = (c: string) => {
+    const i = REVIEW_ORDER.indexOf(c)
+    return i === -1 ? REVIEW_ORDER.length + seen.indexOf(c) : i
+  }
+  return seen
+    .sort((a, b) => rank(a) - rank(b))
+    .map((category) => ({ category, lines: map.get(category)! }))
 }
+
+export const useGroupedReview = (): ReviewGroup[] => groupReview(useReviewLines())

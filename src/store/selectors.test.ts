@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useBundleStore } from './useBundleStore'
-import { reviewLines, selectedCount, totals } from './selectors'
+import { reviewLines, selectedCount, totals, groupReview } from './selectors'
 
 const qty = () => useBundleStore.getState().qty
 beforeEach(() => useBundleStore.getState().reset())
@@ -29,5 +29,10 @@ describe('selectors (seeded design state)', () => {
     expect(selectedCount(qty(), 'cameras')).toBe(2) // v4 + pan v3, still 2
     expect(selectedCount(qty(), 'sensors')).toBe(2) // motion + hub
     expect(selectedCount(qty(), 'plan')).toBe(1)
+  })
+
+  it('groups the review with the plan LAST (design order, not builder order)', () => {
+    const groups = groupReview(reviewLines(qty()))
+    expect(groups.map((g) => g.category)).toEqual(['Cameras', 'Sensors', 'Accessories', 'Plan'])
   })
 })
