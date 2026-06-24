@@ -1,21 +1,20 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import catalogJson from '../data/catalog.json'
-import { type Catalog, vkey } from '../types'
-
-const catalog = catalogJson as Catalog
+import { getCatalog } from '../data/catalog'
+import { vkey } from '../types'
 
 /** Minimum allowed quantity for a product. Required items (Sense Hub) can't go below 1. */
 export const minQty = (productId: string) =>
-  catalog.products[productId]?.required ? 1 : 0
+  getCatalog().products[productId]?.required ? 1 : 0
 
 function seededQty(): Record<string, number> {
   const qty: Record<string, number> = {}
-  for (const s of catalog.seed) qty[vkey(s.productId, s.variantId)] = s.qty
+  for (const s of getCatalog().seed) qty[vkey(s.productId, s.variantId)] = s.qty
   return qty
 }
 
 function defaultActive(): Record<string, string> {
+  const catalog = getCatalog()
   const active: Record<string, string> = {}
   for (const p of Object.values(catalog.products)) active[p.id] = p.variants[0].id
   // A seeded variant should be the active chip on load (e.g. White cam pre-selected).
@@ -43,7 +42,7 @@ export const useBundleStore = create<BuilderState>()(
     (set, get) => ({
       qty: seededQty(),
       activeVariant: defaultActive(),
-      openStepId: catalog.steps[0].id,
+      openStepId: getCatalog().steps[0].id,
       saved: false,
 
       // setQty is the single gate for quantity changes: it clamps to the product's
@@ -61,6 +60,7 @@ export const useBundleStore = create<BuilderState>()(
 
       selectSingle: (stepId, productId) =>
         set((s) => {
+          const catalog = getCatalog()
           const step = catalog.steps.find((st) => st.id === stepId)
           if (!step) return s
           const qty = { ...s.qty }
@@ -80,7 +80,7 @@ export const useBundleStore = create<BuilderState>()(
         set({
           qty: seededQty(),
           activeVariant: defaultActive(),
-          openStepId: catalog.steps[0].id,
+          openStepId: getCatalog().steps[0].id,
           saved: false,
         }),
     }),

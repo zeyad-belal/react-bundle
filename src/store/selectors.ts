@@ -1,8 +1,7 @@
-import catalogJson from '../data/catalog.json'
-import { type Catalog, vkey } from '../types'
+import { getCatalog } from '../data/catalog'
+import { vkey } from '../types'
 import { useBundleStore } from './useBundleStore'
 
-const catalog = catalogJson as Catalog
 const round2 = (n: number) => Math.round(n * 100) / 100
 
 export interface ReviewLine {
@@ -23,6 +22,7 @@ export interface ReviewLine {
 
 /** One line per product+variant with qty > 0, in catalog/step order. */
 export function reviewLines(qty: Record<string, number>): ReviewLine[] {
+  const catalog = getCatalog()
   const lines: ReviewLine[] = []
   for (const step of catalog.steps) {
     for (const pid of step.productIds) {
@@ -53,6 +53,7 @@ export function reviewLines(qty: Record<string, number>): ReviewLine[] {
 
 /** Number of distinct products in a step with total qty > 0 (variants collapse to one). */
 export function selectedCount(qty: Record<string, number>, stepId: string): number {
+  const catalog = getCatalog()
   const step = catalog.steps.find((s) => s.id === stepId)
   if (!step) return 0
   let count = 0

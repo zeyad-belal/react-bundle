@@ -12,8 +12,9 @@ dist
 dist-ssr
 *.local
 
-# Local MCP server config (e.g. Figma) — local tooling, not part of the deliverable
+# Local agent/editor tooling — not part of the deliverable
 .mcp.json
+.claude/
 
 # Editor directories and files
 .vscode/*

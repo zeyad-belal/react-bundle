@@ -1,12 +1,10 @@
 import clsx from 'clsx'
-import catalogJson from '../data/catalog.json'
-import { type Catalog, type Step } from '../types'
+import { getCatalog } from '../data/catalog'
+import { type Step } from '../types'
 import { useBundleStore } from '../store/useBundleStore'
 import { useSelectedCount } from '../store/selectors'
 import { ProductCard } from './ProductCard'
 import { Icon } from './Icon'
-
-const catalog = catalogJson as Catalog
 
 interface Props {
   step: Step
@@ -14,6 +12,7 @@ interface Props {
 }
 
 export function AccordionStep({ step, index }: Props) {
+  const catalog = getCatalog()
   const open = useBundleStore((s) => s.openStepId === step.id)
   const count = useSelectedCount(step.id)
   const nextStep = catalog.steps[index + 1]

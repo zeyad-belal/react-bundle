@@ -12,7 +12,16 @@ Requires Node 20+.
 
 ```bash
 npm install
-npm run dev      # start the dev server (prints a localhost URL)
+npm run dev      # runs BOTH the JSON server (:4000) and the Vite app together
+```
+
+`npm run dev` starts two processes via `concurrently`: the **JSON server** that serves the catalog
+and the **Vite** dev server (it prints a localhost URL). Open that URL. You can also run them
+separately:
+
+```bash
+npm run server   # json-server serving server/db.json at http://localhost:4000/catalog
+npm run client   # vite only (expects the server to be running)
 ```
 
 Other scripts:
@@ -23,13 +32,17 @@ npm run build    # type-check (tsc) + production build (Vite)
 npm run lint     # oxlint
 ```
 
-Everything runs from a clean clone with just `npm install` — there is no backend to start.
+Builds and runs from a clean clone with `npm install` then `npm run dev`.
 
 ## How it works
 
 ```
+server/db.json          ← the catalog data, served by json-server at /catalog
 src/
-  data/catalog.json     ← the single data source: steps, products, variants, prices, seed
+  data/
+    catalog.ts          ← runtime catalog holder (getCatalog / setCatalog)
+    fetchCatalog.ts     ← fetches /api/catalog at boot
+  Boot.tsx              ← loads the catalog, then renders the app (loading/error states)
   types.ts              ← Catalog/Product/Variant/Step types + vkey() helper
   store/
     useBundleStore.ts   ← Zustand store: qty, activeVariant, openStepId (+ persist)
@@ -40,8 +53,11 @@ src/
 public/products/*.svg   ← recreated device illustrations
 ```
 
-**Data-driven.** Every card and review line is rendered by mapping over `catalog.json` — there is no
-per-product markup. Adding a product is a JSON edit.
+**Data-driven, served from an API.** The catalog lives in `server/db.json` and is served by
+**json-server**. The app **fetches** it at startup (`/api/catalog`, proxied by Vite to the json
+server) — nothing per-product is hardcoded and the data isn't bundled into the JS. Adding a product
+is a `server/db.json` edit. The store and selectors read the catalog through a small runtime holder
+(`getCatalog()`), which `Boot.tsx` populates after the fetch (tests inject it synchronously).
 
 **Tiny store, everything else derived.** The store holds only what the user changes:
 
@@ -85,13 +101,15 @@ full-app integration render. Run `npm test`.
   the design. Every other step uses quantity steppers.
 - **Responsive.** Desktop (≥1024px) is the two-column layout with a sticky review sidebar; on tablet
   the review stacks below the builder; on mobile it's a single column. Verified down to phone widths.
-- **Checkout** is a demo confirmation (no payment). The **backend bonus was skipped** — a local JSON
-  file per the brief.
+- **Checkout** is a demo confirmation (no payment).
+- **Backend bonus done.** The catalog is served by json-server from `server/db.json` and fetched at
+  runtime, rather than bundled as a static import.
 
 ## Not done / could go further
 
-- Visual fidelity is matched at the code level from screenshots; with a Figma connection the tokens
-  could be pixel-exact.
-- No active-chip highlight styling (explicitly deferred by the brief — the selection *behavior* and
-  its flow into the review panel are what matter, and those work).
+- Visual fidelity uses exact Figma tokens, but I had no way to screenshot the running app to do a
+  final pixel-diff myself — worth an eyeball pass in the browser.
+- The fonts are Poppins (free) standing in for the design's commercial Gilroy / TT Norms Pro.
+- The deployed/`preview` build expects the catalog API to be reachable; the dev flow (`npm run dev`)
+  runs the server for you. For a static deploy you'd point `VITE_API_URL` at a hosted endpoint.
 - Accessibility is sensible-defaults (labelled controls, semantic regions) but not audited.

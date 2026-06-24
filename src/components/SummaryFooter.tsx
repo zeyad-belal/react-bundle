@@ -1,19 +1,16 @@
 import { useState } from 'react'
-import catalogJson from '../data/catalog.json'
-import { type Catalog } from '../types'
+import { getCatalog } from '../data/catalog'
 import { useTotals, formatMoney } from '../store/selectors'
 import { useBundleStore } from '../store/useBundleStore'
 import { PriceTag } from './PriceTag'
 import { GuaranteeBadge } from './GuaranteeBadge'
 import { Icon } from './Icon'
 
-const catalog = catalogJson as Catalog
-
 export function SummaryFooter() {
   const { total, preDiscount, savings } = useTotals()
   const saved = useBundleStore((s) => s.saved)
   const [placed, setPlaced] = useState(false)
-  const { shipping, financingLabel } = catalog.summary
+  const { shipping, financingLabel } = getCatalog().summary
 
   return (
     <div className="space-y-4 pt-3">

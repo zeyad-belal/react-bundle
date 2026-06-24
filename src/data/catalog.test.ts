@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import catalogJson from './catalog.json'
+import db from '../../server/db.json'
 import type { Catalog } from '../types'
 
-const catalog = catalogJson as Catalog
+const catalog = (db as { catalog: Catalog }).catalog
 
 describe('catalog integrity', () => {
   it('every step productId resolves to a product', () => {
