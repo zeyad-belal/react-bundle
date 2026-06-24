@@ -17,28 +17,28 @@ export function SummaryFooter() {
 
   return (
     <div className="space-y-4 pt-3">
-      <div className="flex items-center gap-3 border-t border-line pt-4">
-        <span className="grid h-9 w-9 place-items-center rounded-md bg-white text-save">
+      <div className="flex items-center gap-3 border-t border-divider pt-4">
+        <span className="grid h-[41px] w-[41px] place-items-center rounded-[5px] border border-line bg-white text-ink">
           <Icon name="truck" />
         </span>
-        <span className="flex-1 text-sm font-medium text-ink">{shipping.label}</span>
-        <PriceTag price={shipping.price} compareAt={shipping.compareAt} />
+        <span className="flex-1 text-sm text-ink">{shipping.label}</span>
+        <PriceTag price={shipping.price} compareAt={shipping.compareAt} align="col" />
       </div>
 
-      <div className="flex items-center gap-4 border-t border-line pt-4">
+      <div className="flex items-center justify-between gap-3 pt-2">
         <GuaranteeBadge />
-        <div className="flex-1">
-          <span className="inline-block rounded bg-accent px-2 py-0.5 text-xs font-medium text-white">
+        <div className="flex flex-col items-end gap-2">
+          <span className="inline-block rounded-[3px] bg-accent px-2 py-[5px] text-xs font-medium tracking-tight text-white">
             {financingLabel}
           </span>
-          <div className="mt-1.5 flex items-baseline gap-2">
-            <span className="text-muted line-through">{formatMoney(preDiscount)}</span>
-            <span className="text-2xl font-bold text-accent">{formatMoney(total)}</span>
+          <div className="flex items-baseline gap-2">
+            <span className="text-[18px] text-muted line-through">{formatMoney(preDiscount)}</span>
+            <span className="text-[24px] font-bold leading-8 text-accent">{formatMoney(total)}</span>
           </div>
         </div>
       </div>
 
-      <p className="text-center text-sm font-medium text-save">
+      <p className="pt-2.5 text-center text-xs font-semibold text-save">
         Congrats! You&apos;re saving {formatMoney(savings)} on your security bundle!
       </p>
 
@@ -48,7 +48,7 @@ export function SummaryFooter() {
           useBundleStore.getState().saveForLater()
           setPlaced(true)
         }}
-        className="w-full rounded-xl bg-accent py-3 font-semibold text-white transition hover:opacity-95"
+        className="w-full rounded-[4px] bg-accent py-[13px] text-[17px] font-bold text-white transition hover:opacity-95"
       >
         Checkout
       </button>
@@ -62,7 +62,7 @@ export function SummaryFooter() {
       <button
         type="button"
         onClick={() => useBundleStore.getState().saveForLater()}
-        className="block w-full text-center text-sm italic text-muted underline underline-offset-2 hover:text-ink"
+        className="block w-full text-center text-sm italic text-faint underline underline-offset-2 hover:text-ink"
       >
         {saved ? 'Saved ✓ — Save my system for later' : 'Save my system for later'}
       </button>

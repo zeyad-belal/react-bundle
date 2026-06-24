@@ -17,12 +17,12 @@ export function QtyStepper({
   size = 'md',
 }: Props) {
   const btn = clsx(
-    'grid place-items-center rounded-md border border-line text-ink transition',
+    'grid place-items-center rounded-[4px] border border-line bg-white text-ink transition',
     'enabled:hover:border-accent enabled:hover:text-accent',
-    'disabled:opacity-40 disabled:cursor-not-allowed',
-    size === 'sm' ? 'h-6 w-6' : 'h-8 w-8',
+    'disabled:bg-[#f1f1f2] disabled:text-muted disabled:cursor-not-allowed',
+    size === 'sm' ? 'h-5 w-5' : 'h-7 w-7',
   )
-  const glyph = size === 'sm' ? 12 : 14
+  const glyph = size === 'sm' ? 8 : 11
   return (
     <div className="flex items-center gap-2">
       <button
@@ -34,7 +34,12 @@ export function QtyStepper({
       >
         <Icon name="minus" width={glyph} height={glyph} />
       </button>
-      <span className={clsx('text-center tabular-nums', size === 'sm' ? 'w-4 text-sm' : 'w-5')}>
+      <span
+        className={clsx(
+          'text-center text-sm font-semibold tabular-nums text-ink',
+          size === 'sm' ? 'w-4' : 'w-5',
+        )}
+      >
         {value}
       </span>
       <button

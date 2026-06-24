@@ -7,13 +7,13 @@ export function ReviewLine({ line }: { line: Line }) {
   const { increment, decrement } = useBundleStore.getState()
 
   return (
-    <div className="flex items-center gap-3 py-2">
+    <div className="flex items-center gap-3 py-0.5">
       <img
         src={line.image}
         alt=""
-        className="h-9 w-9 shrink-0 rounded-md border border-line bg-white object-contain p-0.5"
+        className="h-[41px] w-[41px] shrink-0 rounded-[5px] border border-line bg-white object-contain p-1"
       />
-      <span className="min-w-0 flex-1 truncate text-sm text-ink">
+      <span className="min-w-0 flex-1 text-sm leading-tight text-ink">
         {line.name}
         {line.required && ' (Required)'}
       </span>

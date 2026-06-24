@@ -1,13 +1,22 @@
 @import 'tailwindcss';
 
+/* Exact tokens pulled from the Figma file (node 1:27 / review 1:28).
+   Gilroy + TT Norms Pro are commercial; Poppins is the closest free Google Font. */
 @theme {
-  --color-accent: #4b36cd;
+  --font-sans: 'Poppins', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  --color-accent: #4e2fd2; /* core/wyze purple */
   --color-accent-soft: #ece9fb;
-  --color-panel: #f4f6ff;
-  --color-ink: #15131a;
-  --color-muted: #6b6675;
-  --color-line: #e6e5ea;
-  --color-save: #1f9d57;
+  --color-panel: #edf4ff; /* review + expanded-step background */
+  --color-ink: #0b0d10; /* Gray-C/Obsidian — product names, qty */
+  --color-heading: #1f1f1f; /* section headings */
+  --color-muted: #6f7882; /* Gray-C/600 — struck prices, body */
+  --color-line: #e6ebf0; /* Gray-C/300 — card / accordion borders */
+  --color-divider: #ced6de; /* Gray-C/400 — review group separators */
+  --color-label: #a8b2bd; /* Gray-C/500 — category subheadings */
+  --color-faint: #484848; /* "Review" eyebrow + save link */
+  --color-save: #0aa288; /* savings callout green */
+
   --radius-card: 14px;
 }
 
@@ -25,7 +34,7 @@ body {
   margin: 0;
   background: #fff;
   color: var(--color-ink);
-  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -16,12 +16,12 @@ export function VariantChips({ variants, active, onSelect }: Props) {
           type="button"
           onClick={() => onSelect(v.id)}
           className={clsx(
-            'flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition',
+            'flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition',
             v.id === active ? 'border-accent text-ink' : 'border-line text-muted hover:border-accent/50',
           )}
         >
           <span
-            className="h-3 w-3 rounded-full border border-line"
+            className="h-3.5 w-3.5 rounded-full border border-line"
             style={{ background: v.swatch }}
           />
           {v.label}

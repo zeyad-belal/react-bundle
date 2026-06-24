@@ -66,9 +66,10 @@ full-app integration render. Run `npm test`.
 
 ## Decisions & tradeoffs
 
-- **Built from the screenshots, not Figma.** A live Figma connection wasn't available, so exact
-  hex/spacing are estimated from the provided screenshots and tuned by eye. The design tokens live as
-  CSS variables in `src/index.css` (`@theme`) so they're easy to adjust in one place.
+- **Exact tokens pulled from Figma.** Colors, type, spacing, and radii were read directly from the
+  Figma file via the Figma MCP and live as CSS variables in `src/index.css` (`@theme`) — accent
+  `#4E2FD2`, panel `#EDF4FF`, ink `#0B0D10`, savings green `#0AA288`, etc. The design's fonts (Gilroy
+  + TT Norms Pro) are commercial, so the app uses **Poppins** (Google Fonts), the closest free match.
 - **Recreated product imagery.** The real Wyze product photos weren't available, so each device is a
   hand-crafted SVG in `public/products/` (no external/copyright dependency). They're referenced by an
   `image` field in the catalog and swap out cleanly for real assets.
