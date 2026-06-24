@@ -23,30 +23,31 @@ export function ProductCard({ product, selection, stepId }: Props) {
   return (
     <article
       className={clsx(
-        'relative flex gap-4 rounded-card border-2 bg-white p-4 transition',
-        selected ? 'border-accent' : 'border-line',
+        'relative flex items-center gap-[19px] rounded-[10px] border-2 bg-white p-[11px] transition',
+        selected ? 'border-accent/70' : 'border-line',
       )}
     >
-      {product.badge && (
-        <span className="absolute left-3 top-3 z-10 rounded-md bg-accent px-2 py-0.5 text-[11px] font-semibold text-white">
-          {product.badge}
-        </span>
-      )}
+      <div className="relative h-[137px] w-[101px] shrink-0 self-stretch overflow-hidden rounded-[5px]">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="h-full w-full object-contain"
+        />
+        {product.badge && (
+          <span className="absolute left-0 top-0 rounded-[10px] bg-accent px-1.5 py-0.5 text-[12px] font-semibold text-white">
+            {product.badge}
+          </span>
+        )}
+      </div>
 
-      <img
-        src={product.image}
-        alt={product.name}
-        className="h-28 w-24 shrink-0 self-center object-contain"
-      />
-
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className="space-y-1">
-          <h3 className="font-semibold leading-tight text-ink">{product.name}</h3>
+      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+        <div className="flex flex-col gap-2">
+          <h3 className="text-[16px] font-semibold leading-none text-heading">{product.name}</h3>
           {product.description && (
-            <p className="text-sm leading-snug text-muted">
+            <p className="text-[12px] leading-[1.3] text-[rgba(31,31,31,0.75)]">
               {product.description}{' '}
               {product.learnMoreUrl && (
-                <a href={product.learnMoreUrl} className="font-medium text-accent underline">
+                <a href={product.learnMoreUrl} className="text-[#0000ee] underline">
                   Learn More
                 </a>
               )}
@@ -62,13 +63,13 @@ export function ProductCard({ product, selection, stepId }: Props) {
           />
         )}
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-1">
+        <div className="mt-auto flex items-end justify-between gap-2.5 pt-1">
           {selection === 'single' ? (
             <button
               type="button"
               onClick={() => selectSingle(stepId, product.id)}
               className={clsx(
-                'rounded-md border px-3 py-1 text-sm font-medium transition',
+                'rounded-[4px] border px-3 py-1 text-sm font-medium transition',
                 selected
                   ? 'border-accent bg-accent text-white'
                   : 'border-accent text-accent hover:bg-accent-soft',
@@ -84,7 +85,13 @@ export function ProductCard({ product, selection, stepId }: Props) {
               onDecrement={() => decrement(product.id, variant.id)}
             />
           )}
-          <PriceTag price={variant.price} compareAt={variant.compareAt} unit={product.priceUnit} />
+          <PriceTag
+            price={variant.price}
+            compareAt={variant.compareAt}
+            unit={product.priceUnit}
+            align="col"
+            tone="card"
+          />
         </div>
       </div>
     </article>

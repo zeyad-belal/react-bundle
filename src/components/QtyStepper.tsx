@@ -36,8 +36,8 @@ export function QtyStepper({
       </button>
       <span
         className={clsx(
-          'text-center text-sm font-semibold tabular-nums text-ink',
-          size === 'sm' ? 'w-4' : 'w-5',
+          'text-center tabular-nums text-ink',
+          size === 'sm' ? 'w-4 text-sm font-semibold' : 'w-5 text-[16px] font-medium',
         )}
       >
         {value}

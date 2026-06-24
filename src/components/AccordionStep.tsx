@@ -20,7 +20,7 @@ export function AccordionStep({ step, index }: Props) {
 
   return (
     <section className="border-b border-line last:border-b-0">
-      <p className="px-5 pt-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
+      <p className="px-5 pt-3 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">
         Step {index + 1} of 4
       </p>
 
@@ -30,7 +30,14 @@ export function AccordionStep({ step, index }: Props) {
         className={clsx('flex w-full items-center gap-3 px-5 pb-3 pt-2 text-left', open && 'bg-panel')}
       >
         <Icon name={step.icon} className="shrink-0 text-ink" />
-        <h2 className="flex-1 text-lg font-semibold text-ink">{step.title}</h2>
+        <h2
+          className={clsx(
+            'flex-1 font-semibold text-heading',
+            open ? 'text-[22px]' : 'text-lg',
+          )}
+        >
+          {step.title}
+        </h2>
         <span className="text-sm font-medium text-accent">{count} selected</span>
         <Icon
           name="chevron"
@@ -40,7 +47,7 @@ export function AccordionStep({ step, index }: Props) {
 
       {open && (
         <div className="bg-panel px-5 pb-6">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {step.productIds.map((pid) => (
               <ProductCard
                 key={pid}
