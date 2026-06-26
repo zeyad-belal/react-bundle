@@ -19,7 +19,12 @@ export function AccordionStep({ step, index }: Props) {
 
   return (
     <section className="border-b border-line last:border-b-0">
-      <p className="px-5 pt-3 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">
+      <p
+        className={clsx(
+          'px-5 pt-3 text-[12px] font-medium uppercase tracking-[0.08em] text-muted',
+          open && 'bg-panel',
+        )}
+      >
         Step {index + 1} of 4
       </p>
 
