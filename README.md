@@ -27,7 +27,6 @@ npm run client   # vite only (expects the server to be running)
 Other scripts:
 
 ```bash
-npm test         # run the unit + integration tests (Vitest)
 npm run build    # type-check (tsc) + production build (Vite)
 npm run lint     # oxlint
 ```
@@ -57,7 +56,7 @@ public/products/*.svg   ← recreated device illustrations
 **json-server**. The app **fetches** it at startup (`/api/catalog`, proxied by Vite to the json
 server) — nothing per-product is hardcoded and the data isn't bundled into the JS. Adding a product
 is a `server/db.json` edit. The store and selectors read the catalog through a small runtime holder
-(`getCatalog()`), which `Boot.tsx` populates after the fetch (tests inject it synchronously).
+(`getCatalog()`), which `Boot.tsx` populates after the fetch.
 
 **Tiny store, everything else derived.** The store holds only what the user changes:
 
@@ -74,11 +73,6 @@ same source.
 **Persistence.** The store uses Zustand's `persist` middleware to mirror `{ qty, activeVariant,
 openStepId }` to `localStorage` (key `wyze-bundle-v1`). State auto-restores on reload; the **Save my
 system for later** link makes that save intent explicit and shows a confirmation.
-
-**Tests.** Vitest covers the logic that actually carries risk: variant-quantity isolation, the
-required-item clamp (Sense Hub can't drop below 1), single-select plan behavior, the exact totals
-($187.89 / $238.81 / $50.92), "N selected" counting distinct products, persistence round-trip, and a
-full-app integration render. Run `npm test`.
 
 ## Decisions & tradeoffs
 
